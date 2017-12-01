@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <!--
+        Added the constraints for entity Claim.
+    -->
+    <changeSet id="20171201162058-2" author="jhipster">
+        
+        <addForeignKeyConstraint baseColumnNames="worker_id"
+                                 baseTableName="claim"
+                                 constraintName="fk_claim_worker_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="worker"/>
+
+        <addForeignKeyConstraint baseColumnNames="employer_id"
+                                 baseTableName="claim"
+                                 constraintName="fk_claim_employer_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="employer"/>
+
+    </changeSet>
+</databaseChangeLog>

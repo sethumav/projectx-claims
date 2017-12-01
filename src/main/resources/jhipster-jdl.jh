@@ -1,0 +1,31 @@
+entity Worker {
+    identifier String required minlength(6)
+    firstName String required maxlength(100)
+    lastName String required maxlength(100)
+    dateOfBirth LocalDate required
+}
+
+entity Employer {
+    identifier String required minlength(6)
+    name String required maxlength(100)
+}
+
+enum ClaimStatus {
+    OPEN, IN_PROGRESS, CLOSED
+}
+
+entity Claim {
+    identifier String required minlength(6),
+    opened_dt  LocalDate required,
+    status ClaimStatus required
+}
+
+relationship ManyToOne {
+    Claim{worker(identifier) required} to Worker{claim}
+}
+
+relationship ManyToOne {
+    Claim{employer(identifier)} to Employer{claim}
+}
+
+paginate Claim with infinite-scroll
