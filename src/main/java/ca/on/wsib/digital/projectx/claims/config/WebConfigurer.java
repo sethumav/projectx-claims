@@ -38,15 +38,13 @@ public class WebConfigurer implements ServletContextInitializer, EmbeddedServlet
 
     private final JHipsterProperties jHipsterProperties;
 
-    private final HazelcastInstance hazelcastInstance;
-
     private MetricRegistry metricRegistry;
 
-    public WebConfigurer(Environment env, JHipsterProperties jHipsterProperties, HazelcastInstance hazelcastInstance) {
+    public WebConfigurer(Environment env, JHipsterProperties jHipsterProperties) {
 
         this.env = env;
         this.jHipsterProperties = jHipsterProperties;
-        this.hazelcastInstance = hazelcastInstance;
+       // this.hazelcastInstance = hazelcastInstance;
     }
 
     @Override

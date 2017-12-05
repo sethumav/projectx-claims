@@ -24,6 +24,7 @@ import javax.annotation.PreDestroy;
 
 @Configuration
 @EnableCaching
+@Profile("hazelcast")
 @AutoConfigureAfter(value = { MetricsConfiguration.class })
 @AutoConfigureBefore(value = { WebConfigurer.class, DatabaseConfiguration.class })
 public class CacheConfiguration {
