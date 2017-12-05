@@ -8,8 +8,8 @@ RUN mkdir -p /app
 WORKDIR /app
 
 # copy other source files (keep code snapshot in image)
-COPY pom.xml /app
-COPY src /app/src
+COPY ../../../pom.xml /app
+COPY ../../../src /app/src
 
 # run packaging
 RUN mvn package -T 1C
