@@ -32,7 +32,7 @@ hystrix:
 
 logging:
     level:
-        ROOT: #logback.loglevel#
+        ROOT: DEBUG
         ca.on.wsib.digital.projectx.claims: #logback.loglevel#
         io.github.jhipster: #logback.loglevel#
 

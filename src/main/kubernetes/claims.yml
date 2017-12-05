@@ -26,16 +26,13 @@ spec:
         imagePullPolicy: Always
         command: [
             "java",
-            "${JAVA_OPTS}",
+            "-Dspring.profiles.active=dev",
             "-Djava.security.egd=file:/dev/./urandom",
             "-jar",
             "/app.war",
             "-b",
             "0.0.0.0"
         ]
-        env:
-        - name: JAVA_OPTS
-          value: -Dspring.profiles.active=dev
         ports:
         - containerPort: 8081
         livenessProbe:
