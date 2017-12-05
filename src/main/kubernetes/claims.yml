@@ -23,7 +23,7 @@ spec:
       containers:
       - name: claims
         image: "wsibdigital.azurecr.io/projectx/claims:alexei"
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         command: [
             "java",
             "${JAVA_OPTS}",
