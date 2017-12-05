@@ -38,9 +38,13 @@ spec:
         livenessProbe:
           tcpSocket:
             port: 8081
+          initialDelaySeconds: 10
+          timeoutSeconds: 30
         readinessProbe:
           tcpSocket:
             port: 8081
+          initialDelaySeconds: 10
+          timeoutSeconds: 30
       imagePullSecrets:
       - name: regsecret
 ---
