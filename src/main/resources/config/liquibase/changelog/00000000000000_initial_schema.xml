@@ -80,6 +80,12 @@
                                  constraintName="fk_authority_name"
                                  referencedColumnNames="name"
                                  referencedTableName="jhi_authority"/>
+
+        <loadData encoding="UTF-8"
+                  file="config/liquibase/users.csv"
+                  separator=";"
+                  tableName="jhi_user"/>
+
         <loadData encoding="UTF-8"
                   file="config/liquibase/authorities.csv"
                   separator=";"
