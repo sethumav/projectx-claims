@@ -10,5 +10,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @ConfigurationProperties(prefix = "application", ignoreUnknownFields = false)
 public class ApplicationProperties {
+    private String disableSecurity;
 
+    public String getDisableSecurity() {
+        return disableSecurity;
+    }
+
+    public void setDisableSecurity(String disableSecurity) {
+        this.disableSecurity = disableSecurity;
+    }
 }

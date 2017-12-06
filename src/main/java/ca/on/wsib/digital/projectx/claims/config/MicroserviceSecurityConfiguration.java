@@ -1,10 +1,19 @@
 package ca.on.wsib.digital.projectx.claims.config;
 
 import ca.on.wsib.digital.projectx.claims.security.AuthoritiesConstants;
-import ca.on.wsib.digital.projectx.claims.security.oauth2.*;
+import ca.on.wsib.digital.projectx.claims.security.oauth2.CachedUserInfoTokenServices;
+import ca.on.wsib.digital.projectx.claims.security.oauth2.SimpleAuthoritiesExtractor;
+import ca.on.wsib.digital.projectx.claims.security.oauth2.SimplePrincipalExtractor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.security.oauth2.resource.*;
-import org.springframework.context.annotation.*;
+import org.springframework.boot.autoconfigure.security.SecurityProperties;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.AuthoritiesExtractor;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.PrincipalExtractor;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.UserInfoTokenServices;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -13,6 +22,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
+import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
@@ -36,14 +46,18 @@ public class MicroserviceSecurityConfiguration extends ResourceServerConfigurerA
 
     private final SecurityProblemSupport problemSupport;
 
+    private final SecurityProperties securityProperties;
+
     public MicroserviceSecurityConfiguration(ResourceServerProperties resourceServerProperties,
-        SecurityProblemSupport problemSupport) {
+        SecurityProblemSupport problemSupport, SecurityProperties securityProperties) {
         this.resourceServerProperties = resourceServerProperties;
         this.problemSupport = problemSupport;
+        this.securityProperties = securityProperties;
     }
 
     @Bean
     @Primary
+    @ConditionalOnProperty(name="security.basic.enabled", havingValue = "true")
     public UserInfoTokenServices userInfoTokenServices(PrincipalExtractor principalExtractor, AuthoritiesExtractor authoritiesExtractor) {
         UserInfoTokenServices userInfoTokenServices =
             new CachedUserInfoTokenServices(resourceServerProperties.getUserInfoUri(), resourceServerProperties.getClientId());
@@ -59,6 +73,7 @@ public class MicroserviceSecurityConfiguration extends ResourceServerConfigurerA
     }
 
     @Bean
+    @ConditionalOnProperty(name="security.basic.enabled", havingValue = "true")
     public AuthoritiesExtractor authoritiesExtractor() {
         return new SimpleAuthoritiesExtractor(OAUTH2_AUTHORITIES_ATTRIBUTE);
     }
@@ -81,14 +96,21 @@ public class MicroserviceSecurityConfiguration extends ResourceServerConfigurerA
         .and()
             .authorizeRequests()
             .antMatchers("/api/profile-info").permitAll()
-            .antMatchers("/api/**").authenticated()
-            .antMatchers("/management/health").permitAll()
-            .antMatchers("/management/**").hasAuthority(AuthoritiesConstants.ADMIN);
+            .antMatchers("/management/health").permitAll();
+        if (securityProperties.getBasic().isEnabled()) {
+            http.authorizeRequests()
+                .antMatchers("/api/**").permitAll()
+                .antMatchers("/management/**").permitAll();
+        } else {
+            http.authorizeRequests()
+                .antMatchers("/api/**").authenticated()
+                .antMatchers("/management/**").hasAuthority(AuthoritiesConstants.ADMIN);
+        }
     }
 
     @Bean
     @ConditionalOnProperty("security.oauth2.resource.jwt.key-uri")
-    public TokenStore tokenStore(JwtAccessTokenConverter jwtAccessTokenConverter) {
+     public TokenStore tokenStore(JwtAccessTokenConverter jwtAccessTokenConverter) {
         return new JwtTokenStore(jwtAccessTokenConverter);
     }
 
@@ -113,5 +135,10 @@ public class MicroserviceSecurityConfiguration extends ResourceServerConfigurerA
                 .get("public_key"))
             .map(publicKey -> String.format("-----BEGIN PUBLIC KEY-----\n%s\n-----END PUBLIC KEY-----", publicKey))
             .orElse(resourceServerProperties.getJwt().getKeyValue());
+    }
+
+    @Override
+    public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
+        resources.resourceId(resourceServerProperties.getResourceId());
     }
 }

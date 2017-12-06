@@ -1,0 +1,72 @@
+apiVersion: apps/v1beta1 # for versions before 1.8.0 use apps/v1beta1
+kind: Deployment
+metadata:
+  name: projectx-claims
+  labels:
+    project: projectx
+    app: claims
+    release: '1'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      project: projectx
+      app: claims
+      release: '1'
+  template:
+    metadata:
+      labels:
+        project: projectx
+        app: claims
+        release: '1'
+    spec:
+      containers:
+      - name: claims
+        image: "wsibdigital.azurecr.io/projectx/claims:alexei"
+        imagePullPolicy: Always
+        command: [
+            "java",
+            "-Dspring.profiles.active=dev",
+            "-Djava.security.egd=file:/dev/./urandom",
+            "-jar",
+            "/app.war",
+            "-b",
+            "0.0.0.0"
+        ]
+        env:
+        - name: KEYCLOAK_EXT_URL
+          value: http://keycloak.52.237.23.30.nip.io
+        ports:
+        - containerPort: 8081
+        livenessProbe:
+          tcpSocket:
+            port: 8081
+          initialDelaySeconds: 10
+          timeoutSeconds: 30
+        readinessProbe:
+          tcpSocket:
+            port: 8081
+          initialDelaySeconds: 10
+          timeoutSeconds: 30
+      imagePullSecrets:
+      - name: regsecret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: claims
+  labels:
+    project: projectx
+    app: claims
+    release: '1'
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8081
+    protocol: TCP
+    name: claims
+  selector:
+    project: projectx
+    app: claims
+    release: '1'
+
