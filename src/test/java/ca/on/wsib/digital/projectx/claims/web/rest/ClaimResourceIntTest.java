@@ -3,10 +3,12 @@ package ca.on.wsib.digital.projectx.claims.web.rest;
 import ca.on.wsib.digital.projectx.claims.ClaimsApp;
 
 import ca.on.wsib.digital.projectx.claims.domain.Claim;
-import ca.on.wsib.digital.projectx.claims.domain.Worker;
+import ca.on.wsib.digital.projectx.claims.domain.User;
 import ca.on.wsib.digital.projectx.claims.repository.ClaimRepository;
+import ca.on.wsib.digital.projectx.claims.security.AuthoritiesConstants;
 import ca.on.wsib.digital.projectx.claims.web.rest.errors.ExceptionTranslator;
 
+import io.advantageous.boon.core.Sets;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,8 +24,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.List;
 
 import static ca.on.wsib.digital.projectx.claims.web.rest.TestUtil.createFormattingConversionService;
@@ -32,7 +32,6 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import ca.on.wsib.digital.projectx.claims.domain.enumeration.ClaimStatus;
 /**
  * Test class for the ClaimResource REST controller.
  *
@@ -44,12 +43,6 @@ public class ClaimResourceIntTest {
 
     private static final String DEFAULT_IDENTIFIER = "AAAAAAAAAA";
     private static final String UPDATED_IDENTIFIER = "BBBBBBBBBB";
-
-    private static final LocalDate DEFAULT_OPENEDDT = LocalDate.ofEpochDay(0L);
-    private static final LocalDate UPDATED_OPENEDDT = LocalDate.now(ZoneId.systemDefault());
-
-    private static final ClaimStatus DEFAULT_STATUS = ClaimStatus.OPEN;
-    private static final ClaimStatus UPDATED_STATUS = ClaimStatus.IN_PROGRESS;
 
     @Autowired
     private ClaimRepository claimRepository;
@@ -81,6 +74,19 @@ public class ClaimResourceIntTest {
             .setMessageConverters(jacksonMessageConverter).build();
     }
 
+    private static User getTestUser() {
+        return new User(
+            "test",
+            "john",
+            "doe",
+            "john.doe@jhipter.com",
+            null,
+            null,
+            true,
+            Sets.set(AuthoritiesConstants.ADMIN))
+            ;
+    }
+
     /**
      * Create an entity for this test.
      *
@@ -89,14 +95,12 @@ public class ClaimResourceIntTest {
      */
     public static Claim createEntity(EntityManager em) {
         Claim claim = new Claim()
-            .identifier(DEFAULT_IDENTIFIER)
-            .openeddt(DEFAULT_OPENEDDT)
-            .status(DEFAULT_STATUS);
+            .identifier(DEFAULT_IDENTIFIER);
         // Add required entity
-        Worker worker = WorkerResourceIntTest.createEntity(em);
-        em.persist(worker);
+        User user = getTestUser();
+        em.persist(user);
         em.flush();
-        claim.setWorker(worker);
+        claim.setUser(user);
         return claim;
     }
 
@@ -121,8 +125,6 @@ public class ClaimResourceIntTest {
         assertThat(claimList).hasSize(databaseSizeBeforeCreate + 1);
         Claim testClaim = claimList.get(claimList.size() - 1);
         assertThat(testClaim.getIdentifier()).isEqualTo(DEFAULT_IDENTIFIER);
-        assertThat(testClaim.getOpeneddt()).isEqualTo(DEFAULT_OPENEDDT);
-        assertThat(testClaim.getStatus()).isEqualTo(DEFAULT_STATUS);
     }
 
     @Test
@@ -164,42 +166,6 @@ public class ClaimResourceIntTest {
 
     @Test
     @Transactional
-    public void checkOpeneddtIsRequired() throws Exception {
-        int databaseSizeBeforeTest = claimRepository.findAll().size();
-        // set the field null
-        claim.setOpeneddt(null);
-
-        // Create the Claim, which fails.
-
-        restClaimMockMvc.perform(post("/api/claims")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(claim)))
-            .andExpect(status().isBadRequest());
-
-        List<Claim> claimList = claimRepository.findAll();
-        assertThat(claimList).hasSize(databaseSizeBeforeTest);
-    }
-
-    @Test
-    @Transactional
-    public void checkStatusIsRequired() throws Exception {
-        int databaseSizeBeforeTest = claimRepository.findAll().size();
-        // set the field null
-        claim.setStatus(null);
-
-        // Create the Claim, which fails.
-
-        restClaimMockMvc.perform(post("/api/claims")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(claim)))
-            .andExpect(status().isBadRequest());
-
-        List<Claim> claimList = claimRepository.findAll();
-        assertThat(claimList).hasSize(databaseSizeBeforeTest);
-    }
-
-    @Test
-    @Transactional
     public void getAllClaims() throws Exception {
         // Initialize the database
         claimRepository.saveAndFlush(claim);
@@ -209,9 +175,7 @@ public class ClaimResourceIntTest {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(claim.getId().intValue())))
-            .andExpect(jsonPath("$.[*].identifier").value(hasItem(DEFAULT_IDENTIFIER.toString())))
-            .andExpect(jsonPath("$.[*].openeddt").value(hasItem(DEFAULT_OPENEDDT.toString())))
-            .andExpect(jsonPath("$.[*].status").value(hasItem(DEFAULT_STATUS.toString())));
+            .andExpect(jsonPath("$.[*].identifier").value(hasItem(DEFAULT_IDENTIFIER.toString())));
     }
 
     @Test
@@ -225,9 +189,7 @@ public class ClaimResourceIntTest {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.id").value(claim.getId().intValue()))
-            .andExpect(jsonPath("$.identifier").value(DEFAULT_IDENTIFIER.toString()))
-            .andExpect(jsonPath("$.openeddt").value(DEFAULT_OPENEDDT.toString()))
-            .andExpect(jsonPath("$.status").value(DEFAULT_STATUS.toString()));
+            .andExpect(jsonPath("$.identifier").value(DEFAULT_IDENTIFIER.toString()));
     }
 
     @Test
@@ -250,9 +212,7 @@ public class ClaimResourceIntTest {
         // Disconnect from session so that the updates on updatedClaim are not directly saved in db
         em.detach(updatedClaim);
         updatedClaim
-            .identifier(UPDATED_IDENTIFIER)
-            .openeddt(UPDATED_OPENEDDT)
-            .status(UPDATED_STATUS);
+            .identifier(UPDATED_IDENTIFIER);
 
         restClaimMockMvc.perform(put("/api/claims")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -264,8 +224,6 @@ public class ClaimResourceIntTest {
         assertThat(claimList).hasSize(databaseSizeBeforeUpdate);
         Claim testClaim = claimList.get(claimList.size() - 1);
         assertThat(testClaim.getIdentifier()).isEqualTo(UPDATED_IDENTIFIER);
-        assertThat(testClaim.getOpeneddt()).isEqualTo(UPDATED_OPENEDDT);
-        assertThat(testClaim.getStatus()).isEqualTo(UPDATED_STATUS);
     }
 
     @Test

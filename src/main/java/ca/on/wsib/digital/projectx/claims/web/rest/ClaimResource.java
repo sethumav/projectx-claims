@@ -23,6 +23,8 @@ import java.net.URISyntaxException;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * REST controller for managing Claim.
@@ -87,11 +89,19 @@ public class ClaimResource {
      * GET  /claims : get all the claims.
      *
      * @param pageable the pagination information
+     * @param filter the filter of the request
      * @return the ResponseEntity with status 200 (OK) and the list of claims in body
      */
     @GetMapping("/claims")
     @Timed
-    public ResponseEntity<List<Claim>> getAllClaims(Pageable pageable) {
+    public ResponseEntity<List<Claim>> getAllClaims(Pageable pageable, @RequestParam(required = false) String filter) {
+        if ("form6-is-null".equals(filter)) {
+            log.debug("REST request to get all Claims where form6 is null");
+            return new ResponseEntity<>(StreamSupport
+                .stream(claimRepository.findAll().spliterator(), false)
+                .filter(claim -> claim.getForm6() == null)
+                .collect(Collectors.toList()), HttpStatus.OK);
+        }
         log.debug("REST request to get a page of Claims");
         Page<Claim> page = claimRepository.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/claims");

@@ -15,35 +15,45 @@
     <property name="floatType" value="float" dbms="mysql, oracle, mssql"/>
 
     <!--
-        Added the entity Claim.
+        Added the entity AdditionalDocument.
     -->
-    <changeSet id="20171201162058-1" author="jhipster">
-        <createTable tableName="claim">
+    <changeSet id="20171206002817-1" author="jhipster">
+        <createTable tableName="additional_document">
             <column name="id" type="bigint" autoIncrement="${autoIncrement}">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="identifier" type="varchar(255)">
+            <column name="name" type="varchar(255)">
                 <constraints nullable="false" />
             </column>
 
-            <column name="openeddt" type="date">
-                <constraints nullable="false" />
-            </column>
-
-            <column name="status" type="varchar(255)">
-                <constraints nullable="false" />
-            </column>
-
-            <column name="worker_id" type="bigint">
-                <constraints nullable="false" />
-            </column>
-
-            <column name="employer_id" type="bigint">
+            <column name="description" type="varchar(255)">
                 <constraints nullable="true" />
+            </column>
+
+            <column name="jhi_file" type="longblob">
+                <constraints nullable="false" />
+            </column>
+            <column name="jhi_file_content_type" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+
+            <column name="image_type" type="varchar(255)">
+                <constraints nullable="false" />
             </column>
 
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here, do not remove-->
         </createTable>
+        
+        <createTable tableName="additional_document_claim">
+            <column name="claims_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="additional_documents_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey columnNames="additional_documents_id, claims_id" tableName="additional_document_claim"/>
         
     </changeSet>
     <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here, do not remove-->

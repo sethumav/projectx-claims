@@ -4,15 +4,23 @@
         {
             "relationshipType": "many-to-one",
             "relationshipValidateRules": "required",
-            "relationshipName": "worker",
-            "otherEntityName": "worker",
-            "otherEntityField": "identifier"
+            "relationshipName": "user",
+            "otherEntityName": "user",
+            "otherEntityField": "login"
         },
         {
-            "relationshipType": "many-to-one",
-            "relationshipName": "employer",
-            "otherEntityName": "employer",
-            "otherEntityField": "identifier"
+            "relationshipType": "one-to-one",
+            "relationshipName": "form6",
+            "otherEntityName": "form6",
+            "ownerSide": false,
+            "otherEntityRelationshipName": "claim"
+        },
+        {
+            "relationshipType": "many-to-many",
+            "relationshipName": "additionalDocument",
+            "otherEntityName": "additionalDocument",
+            "ownerSide": false,
+            "otherEntityRelationshipName": "claim"
         }
     ],
     "fields": [
@@ -24,24 +32,9 @@
                 "minlength"
             ],
             "fieldValidateRulesMinlength": 6
-        },
-        {
-            "fieldName": "openeddt",
-            "fieldType": "LocalDate",
-            "fieldValidateRules": [
-                "required"
-            ]
-        },
-        {
-            "fieldName": "status",
-            "fieldType": "ClaimStatus",
-            "fieldValues": "OPEN,IN_PROGRESS,CLOSED",
-            "fieldValidateRules": [
-                "required"
-            ]
         }
     ],
-    "changelogDate": "20171201162058",
+    "changelogDate": "20171206002816",
     "entityTableName": "claim",
     "dto": "no",
     "pagination": "infinite-scroll",

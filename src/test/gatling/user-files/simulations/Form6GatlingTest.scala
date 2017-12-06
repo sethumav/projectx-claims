@@ -7,9 +7,9 @@ import org.slf4j.LoggerFactory
 import scala.concurrent.duration._
 
 /**
- * Performance test for the Employer entity.
+ * Performance test for the Form6 entity.
  */
-class EmployerGatlingTest extends Simulation {
+class Form6GatlingTest extends Simulation {
 
     val context: LoggerContext = LoggerFactory.getILoggerFactory.asInstanceOf[LoggerContext]
     // Log all HTTP requests
@@ -42,7 +42,7 @@ class EmployerGatlingTest extends Simulation {
         "Upgrade-Insecure-Requests" -> "1"
     )
 
-    val scn = scenario("Test the Employer entity")
+    val scn = scenario("Test the Form6 entity")
         .exec(http("First unauthenticated request")
         .get("/api/account")
         .headers(headers_http)
@@ -68,26 +68,26 @@ class EmployerGatlingTest extends Simulation {
         .check(status.is(200)))
         .pause(10)
         .repeat(2) {
-            exec(http("Get all employers")
-            .get("/claims/api/employers")
+            exec(http("Get all form6S")
+            .get("/claims/api/form-6-s")
             .headers(headers_http_authenticated)
             .check(status.is(200)))
             .pause(10 seconds, 20 seconds)
-            .exec(http("Create new employer")
-            .post("/claims/api/employers")
+            .exec(http("Create new form6")
+            .post("/claims/api/form-6-s")
             .headers(headers_http_authenticated)
-            .body(StringBody("""{"id":null, "identifier":"SAMPLE_TEXT", "name":"SAMPLE_TEXT"}""")).asJSON
+            .body(StringBody("""{"id":null, "lastName":"SAMPLE_TEXT", "firstName":"SAMPLE_TEXT", "address":"SAMPLE_TEXT", "phoneNumber":"SAMPLE_TEXT", "cityOrTownName":"SAMPLE_TEXT", "province":null, "postalCode":"SAMPLE_TEXT", "additionalInformation":null, "submittedDate":"2020-01-01T00:00:00.000Z"}""")).asJSON
             .check(status.is(201))
-            .check(headerRegex("Location", "(.*)").saveAs("new_employer_url"))).exitHereIfFailed
+            .check(headerRegex("Location", "(.*)").saveAs("new_form6_url"))).exitHereIfFailed
             .pause(10)
             .repeat(5) {
-                exec(http("Get created employer")
-                .get("/claims${new_employer_url}")
+                exec(http("Get created form6")
+                .get("/claims${new_form6_url}")
                 .headers(headers_http_authenticated))
                 .pause(10)
             }
-            .exec(http("Delete created employer")
-            .delete("/claims${new_employer_url}")
+            .exec(http("Delete created form6")
+            .delete("/claims${new_form6_url}")
             .headers(headers_http_authenticated))
             .pause(10)
         }

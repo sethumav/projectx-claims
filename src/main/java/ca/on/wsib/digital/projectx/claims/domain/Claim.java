@@ -1,15 +1,15 @@
 package ca.on.wsib.digital.projectx.claims.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Objects;
-
-import ca.on.wsib.digital.projectx.claims.domain.enumeration.ClaimStatus;
 
 
 /**
@@ -31,21 +31,18 @@ public class Claim implements Serializable {
     @Column(name = "identifier", nullable = false)
     private String identifier;
 
-    @NotNull
-    @Column(name = "openeddt", nullable = false)
-    private LocalDate openeddt;
-
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
-    private ClaimStatus status;
-
     @ManyToOne(optional = false)
     @NotNull
-    private Worker worker;
+    private User user;
 
-    @ManyToOne
-    private Employer employer;
+    @OneToOne(mappedBy = "claim")
+    @JsonIgnore
+    private Form6 form6;
+
+    @ManyToMany(mappedBy = "claims")
+    @JsonIgnore
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    private Set<AdditionalDocument> additionalDocuments = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
@@ -69,56 +66,55 @@ public class Claim implements Serializable {
         this.identifier = identifier;
     }
 
-    public LocalDate getOpeneddt() {
-        return openeddt;
+    public User getUser() {
+        return user;
     }
 
-    public Claim openeddt(LocalDate openeddt) {
-        this.openeddt = openeddt;
+    public Claim user(User user) {
+        this.user = user;
         return this;
     }
 
-    public void setOpeneddt(LocalDate openeddt) {
-        this.openeddt = openeddt;
+    public void setUser(User user) {
+        this.user = user;
     }
 
-    public ClaimStatus getStatus() {
-        return status;
+    public Form6 getForm6() {
+        return form6;
     }
 
-    public Claim status(ClaimStatus status) {
-        this.status = status;
+    public Claim form6(Form6 form6) {
+        this.form6 = form6;
         return this;
     }
 
-    public void setStatus(ClaimStatus status) {
-        this.status = status;
+    public void setForm6(Form6 form6) {
+        this.form6 = form6;
     }
 
-    public Worker getWorker() {
-        return worker;
+    public Set<AdditionalDocument> getAdditionalDocuments() {
+        return additionalDocuments;
     }
 
-    public Claim worker(Worker worker) {
-        this.worker = worker;
+    public Claim additionalDocuments(Set<AdditionalDocument> additionalDocuments) {
+        this.additionalDocuments = additionalDocuments;
         return this;
     }
 
-    public void setWorker(Worker worker) {
-        this.worker = worker;
-    }
-
-    public Employer getEmployer() {
-        return employer;
-    }
-
-    public Claim employer(Employer employer) {
-        this.employer = employer;
+    public Claim addAdditionalDocument(AdditionalDocument additionalDocument) {
+        this.additionalDocuments.add(additionalDocument);
+        additionalDocument.getClaims().add(this);
         return this;
     }
 
-    public void setEmployer(Employer employer) {
-        this.employer = employer;
+    public Claim removeAdditionalDocument(AdditionalDocument additionalDocument) {
+        this.additionalDocuments.remove(additionalDocument);
+        additionalDocument.getClaims().remove(this);
+        return this;
+    }
+
+    public void setAdditionalDocuments(Set<AdditionalDocument> additionalDocuments) {
+        this.additionalDocuments = additionalDocuments;
     }
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
@@ -147,8 +143,6 @@ public class Claim implements Serializable {
         return "Claim{" +
             "id=" + getId() +
             ", identifier='" + getIdentifier() + "'" +
-            ", openeddt='" + getOpeneddt() + "'" +
-            ", status='" + getStatus() + "'" +
             "}";
     }
 }

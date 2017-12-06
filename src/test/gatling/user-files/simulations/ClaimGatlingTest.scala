@@ -76,7 +76,7 @@ class ClaimGatlingTest extends Simulation {
             .exec(http("Create new claim")
             .post("/claims/api/claims")
             .headers(headers_http_authenticated)
-            .body(StringBody("""{"id":null, "identifier":"SAMPLE_TEXT", "openeddt":"2020-01-01T00:00:00.000Z", "status":null}""")).asJSON
+            .body(StringBody("""{"id":null, "identifier":"SAMPLE_TEXT"}""")).asJSON
             .check(status.is(201))
             .check(headerRegex("Location", "(.*)").saveAs("new_claim_url"))).exitHereIfFailed
             .pause(10)

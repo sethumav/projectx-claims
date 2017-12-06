@@ -7,9 +7,9 @@ import org.slf4j.LoggerFactory
 import scala.concurrent.duration._
 
 /**
- * Performance test for the Worker entity.
+ * Performance test for the AdditionalDocument entity.
  */
-class WorkerGatlingTest extends Simulation {
+class AdditionalDocumentGatlingTest extends Simulation {
 
     val context: LoggerContext = LoggerFactory.getILoggerFactory.asInstanceOf[LoggerContext]
     // Log all HTTP requests
@@ -42,7 +42,7 @@ class WorkerGatlingTest extends Simulation {
         "Upgrade-Insecure-Requests" -> "1"
     )
 
-    val scn = scenario("Test the Worker entity")
+    val scn = scenario("Test the AdditionalDocument entity")
         .exec(http("First unauthenticated request")
         .get("/api/account")
         .headers(headers_http)
@@ -68,26 +68,26 @@ class WorkerGatlingTest extends Simulation {
         .check(status.is(200)))
         .pause(10)
         .repeat(2) {
-            exec(http("Get all workers")
-            .get("/claims/api/workers")
+            exec(http("Get all additionalDocuments")
+            .get("/claims/api/additional-documents")
             .headers(headers_http_authenticated)
             .check(status.is(200)))
             .pause(10 seconds, 20 seconds)
-            .exec(http("Create new worker")
-            .post("/claims/api/workers")
+            .exec(http("Create new additionalDocument")
+            .post("/claims/api/additional-documents")
             .headers(headers_http_authenticated)
-            .body(StringBody("""{"id":null, "identifier":"SAMPLE_TEXT", "firstName":"SAMPLE_TEXT", "lastName":"SAMPLE_TEXT", "dateOfBirth":"2020-01-01T00:00:00.000Z"}""")).asJSON
+            .body(StringBody("""{"id":null, "name":"SAMPLE_TEXT", "description":"SAMPLE_TEXT", "file":null, "imageType":null}""")).asJSON
             .check(status.is(201))
-            .check(headerRegex("Location", "(.*)").saveAs("new_worker_url"))).exitHereIfFailed
+            .check(headerRegex("Location", "(.*)").saveAs("new_additionalDocument_url"))).exitHereIfFailed
             .pause(10)
             .repeat(5) {
-                exec(http("Get created worker")
-                .get("/claims${new_worker_url}")
+                exec(http("Get created additionalDocument")
+                .get("/claims${new_additionalDocument_url}")
                 .headers(headers_http_authenticated))
                 .pause(10)
             }
-            .exec(http("Delete created worker")
-            .delete("/claims${new_worker_url}")
+            .exec(http("Delete created additionalDocument")
+            .delete("/claims${new_additionalDocument_url}")
             .headers(headers_http_authenticated))
             .pause(10)
         }

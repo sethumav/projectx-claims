@@ -1,0 +1,52 @@
+entity Claim {
+    identifier String required minlength(6)
+}
+
+entity AdditionalDocument {
+	name String required,
+    description String,
+	file ImageBlob required,
+    imageType DocumentType required
+}
+
+enum DocumentType {
+	PASSPORT, DIVORCE_ORDER
+}
+
+entity Form6 {
+    lastName String,
+    firstName String,
+    address String,
+    phoneNumber String minlength(10) maxlength(10) pattern(/[0-9]+/),
+    cityOrTownName String,
+    province Province,
+    postalCode String pattern(/[a-zA-Z][0-9][a-zA-Z] [0-9][a-zA-Z][0-9]/),
+    additionalInformation TextBlob,
+    submittedDate Instant   
+}
+
+enum Province {
+    ONTARIO, 
+    QUEBEC, 
+    NOVA_SCOTIA, 
+    NEW_BRUNSWICK, 
+    MANITOBA, 
+    BRITISH_COLUMBIA,
+    PRINCE_EDWARD_ISLAND,
+    SASKATCHEWAN,
+    ALBERTA,
+    NEWFOUNDLAND_AND_LABRADOR
+}
+
+relationship ManyToOne {
+    Claim{user(login) required} to User{claim} 
+}
+relationship OneToOne {
+    Form6{claim(identifier) required} to Claim{form6} 
+}
+relationship ManyToMany {
+    AdditionalDocument{claim(identifier)} to Claim{additionalDocument}
+}
+
+paginate Claim, AdditionalDocument, Form6 with infinite-scroll
+
