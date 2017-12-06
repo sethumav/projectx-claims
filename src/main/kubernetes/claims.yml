@@ -33,6 +33,9 @@ spec:
             "-b",
             "0.0.0.0"
         ]
+        env:
+        - name: KEYCLOAK_EXT_URL
+          value: http://keycloak.52.237.23.30.nip.io
         ports:
         - containerPort: 8081
         livenessProbe:

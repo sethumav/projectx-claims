@@ -22,6 +22,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
+import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
@@ -134,5 +135,10 @@ public class MicroserviceSecurityConfiguration extends ResourceServerConfigurerA
                 .get("public_key"))
             .map(publicKey -> String.format("-----BEGIN PUBLIC KEY-----\n%s\n-----END PUBLIC KEY-----", publicKey))
             .orElse(resourceServerProperties.getJwt().getKeyValue());
+    }
+
+    @Override
+    public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
+        resources.resourceId(resourceServerProperties.getResourceId());
     }
 }

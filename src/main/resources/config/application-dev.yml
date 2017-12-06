@@ -143,4 +143,4 @@ jhipster:
 # ===================================================================
 
 application:
-    disableSecurity: true
+    disableSecurity: false
