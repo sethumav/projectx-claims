@@ -4,7 +4,9 @@ import ca.on.wsib.digital.projectx.claims.ClaimsApp;
 
 import ca.on.wsib.digital.projectx.claims.domain.Form6;
 import ca.on.wsib.digital.projectx.claims.domain.Claim;
+import ca.on.wsib.digital.projectx.claims.domain.User;
 import ca.on.wsib.digital.projectx.claims.repository.Form6Repository;
+import ca.on.wsib.digital.projectx.claims.repository.UserRepository;
 import ca.on.wsib.digital.projectx.claims.web.rest.errors.ExceptionTranslator;
 
 import org.junit.Before;
@@ -74,6 +76,9 @@ public class Form6ResourceIntTest {
     private Form6Repository form6Repository;
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
     @Autowired
@@ -106,7 +111,7 @@ public class Form6ResourceIntTest {
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
      */
-    public static Form6 createEntity(EntityManager em) {
+    public Form6 createEntity(EntityManager em) {
         Form6 form6 = new Form6()
             .lastName(DEFAULT_LAST_NAME)
             .firstName(DEFAULT_FIRST_NAME)
@@ -118,7 +123,7 @@ public class Form6ResourceIntTest {
             .additionalInformation(DEFAULT_ADDITIONAL_INFORMATION)
             .submittedDate(DEFAULT_SUBMITTED_DATE);
         // Add required entity
-        Claim claim = ClaimResourceIntTest.createEntity(em);
+        Claim claim = createClaim(em);
         em.persist(claim);
         em.flush();
         form6.setClaim(claim);
@@ -317,5 +322,21 @@ public class Form6ResourceIntTest {
         assertThat(form61).isNotEqualTo(form62);
         form61.setId(null);
         assertThat(form61).isNotEqualTo(form62);
+    }
+
+    public Claim createClaim(EntityManager em) {
+        Claim claim = new Claim()
+            .identifier("AAAAAAAAAA");
+        // Add required entity
+        User user = getTestUser();
+        em.persist(user);
+        em.flush();
+        claim.setUser(user);
+        return claim;
+    }
+
+
+    private User getTestUser() {
+        return userRepository.findOne(Long.valueOf(4));
     }
 }

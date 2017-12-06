@@ -6,6 +6,7 @@ import ca.on.wsib.digital.projectx.claims.domain.Authority;
 import ca.on.wsib.digital.projectx.claims.domain.Claim;
 import ca.on.wsib.digital.projectx.claims.domain.User;
 import ca.on.wsib.digital.projectx.claims.repository.ClaimRepository;
+import ca.on.wsib.digital.projectx.claims.repository.UserRepository;
 import ca.on.wsib.digital.projectx.claims.security.AuthoritiesConstants;
 import ca.on.wsib.digital.projectx.claims.web.rest.errors.ExceptionTranslator;
 
@@ -46,6 +47,9 @@ public class ClaimResourceIntTest {
     private static final String UPDATED_IDENTIFIER = "BBBBBBBBBB";
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private ClaimRepository claimRepository;
 
     @Autowired
@@ -75,17 +79,8 @@ public class ClaimResourceIntTest {
             .setMessageConverters(jacksonMessageConverter).build();
     }
 
-    private static User getTestUser() {
-        Authority admin = new Authority();
-        admin.setName(AuthoritiesConstants.ADMIN);
-        User user = new User();
-        user.setLogin("test");
-        user.setFirstName("john");
-        user.setLastName("doe");
-        user.setEmail("john.doe@jhipter.com");
-        user.setAuthorities(Sets.set(admin));
-        user.setActivated(true);
-        return user;
+    private User getTestUser() {
+        return userRepository.findOne(Long.valueOf(4));
     }
 
     /**
@@ -94,7 +89,7 @@ public class ClaimResourceIntTest {
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
      */
-    public static Claim createEntity(EntityManager em) {
+    public Claim createEntity(EntityManager em) {
         Claim claim = new Claim()
             .identifier(DEFAULT_IDENTIFIER);
         // Add required entity
