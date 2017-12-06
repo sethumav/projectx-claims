@@ -2,6 +2,7 @@ package ca.on.wsib.digital.projectx.claims.web.rest;
 
 import ca.on.wsib.digital.projectx.claims.ClaimsApp;
 
+import ca.on.wsib.digital.projectx.claims.domain.Authority;
 import ca.on.wsib.digital.projectx.claims.domain.Claim;
 import ca.on.wsib.digital.projectx.claims.domain.User;
 import ca.on.wsib.digital.projectx.claims.repository.ClaimRepository;
@@ -75,16 +76,16 @@ public class ClaimResourceIntTest {
     }
 
     private static User getTestUser() {
-        return new User(
-            "test",
-            "john",
-            "doe",
-            "john.doe@jhipter.com",
-            null,
-            null,
-            true,
-            Sets.set(AuthoritiesConstants.ADMIN))
-            ;
+        Authority admin = new Authority();
+        admin.setName(AuthoritiesConstants.ADMIN);
+        User user = new User();
+        user.setLogin("test");
+        user.setFirstName("john");
+        user.setLastName("doe");
+        user.setEmail("john.doe@jhipter.com");
+        user.setAuthorities(Sets.set(admin));
+        user.setActivated(true);
+        return user;
     }
 
     /**
