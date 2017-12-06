@@ -1,0 +1,73 @@
+{
+    "fluentMethods": true,
+    "relationships": [
+        {
+            "relationshipType": "one-to-one",
+            "relationshipValidateRules": "required",
+            "relationshipName": "claim",
+            "otherEntityName": "claim",
+            "otherEntityField": "identifier",
+            "ownerSide": true,
+            "otherEntityRelationshipName": "form6"
+        }
+    ],
+    "fields": [
+        {
+            "fieldName": "lastName",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "firstName",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "address",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "phoneNumber",
+            "fieldType": "String",
+            "fieldValidateRules": [
+                "minlength",
+                "maxlength",
+                "pattern"
+            ],
+            "fieldValidateRulesMinlength": 10,
+            "fieldValidateRulesMaxlength": 10,
+            "fieldValidateRulesPattern": "[0-9]+"
+        },
+        {
+            "fieldName": "cityOrTownName",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "province",
+            "fieldType": "Province",
+            "fieldValues": "ONTARIO,QUEBEC,NOVA_SCOTIA,NEW_BRUNSWICK,MANITOBA,BRITISH_COLUMBIA,PRINCE_EDWARD_ISLAND,SASKATCHEWAN,ALBERTA,NEWFOUNDLAND_AND_LABRADOR"
+        },
+        {
+            "fieldName": "postalCode",
+            "fieldType": "String",
+            "fieldValidateRules": [
+                "pattern"
+            ],
+            "fieldValidateRulesPattern": "[a-zA-Z][0-9][a-zA-Z] [0-9][a-zA-Z][0-9]"
+        },
+        {
+            "fieldName": "additionalInformation",
+            "fieldType": "byte[]",
+            "fieldTypeBlobContent": "text"
+        },
+        {
+            "fieldName": "submittedDate",
+            "fieldType": "Instant"
+        }
+    ],
+    "changelogDate": "20171206002818",
+    "entityTableName": "form_6",
+    "dto": "no",
+    "pagination": "infinite-scroll",
+    "service": "no",
+    "jpaMetamodelFiltering": false,
+    "microserviceName": "claims"
+}
