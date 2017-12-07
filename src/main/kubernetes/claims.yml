@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
       - name: claims
-        image: "wsibdigital.azurecr.io/projectx/claims:master"
+        image: "projectx/claims:vijay"
         imagePullPolicy: Always
         command: [
             "java",
