@@ -8,6 +8,7 @@ metadata:
     release: '1'
 spec:
   replicas: 1
+  revisionHistoryLimit: 5
   selector:
     matchLabels:
       project: projectx
