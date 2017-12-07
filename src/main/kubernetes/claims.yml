@@ -47,8 +47,8 @@ spec:
         readinessProbe:
           tcpSocket:
             port: 8081
-          initialDelaySeconds: 10
-          timeoutSeconds: 30
+          initialDelaySeconds: 20
+          timeoutSeconds: 45
       imagePullSecrets:
       - name: regsecret
 ---
