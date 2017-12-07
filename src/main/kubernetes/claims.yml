@@ -8,6 +8,7 @@ metadata:
     release: '1'
 spec:
   replicas: 1
+  revisionHistoryLimit: 5
   selector:
     matchLabels:
       project: projectx
@@ -22,7 +23,7 @@ spec:
     spec:
       containers:
       - name: claims
-        image: "wsibdigital.azurecr.io/projectx/claims:alexei"
+        image: "wsibdigital.azurecr.io/projectx/claims:master"
         imagePullPolicy: Always
         command: [
             "java",
