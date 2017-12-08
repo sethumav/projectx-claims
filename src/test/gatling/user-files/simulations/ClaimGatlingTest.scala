@@ -18,6 +18,7 @@ class ClaimGatlingTest extends Simulation {
     //context.getLogger("io.gatling.http").setLevel(Level.valueOf("DEBUG"))
 
     val baseURL = Option(System.getProperty("baseURL")) getOrElse """http://localhost:8080"""
+//    val baseKeycloakURL = Option(System.getProperty("baseKeycloakURL")) getOrElse """http://localhost:9080"""
 
     val httpConf = http
         .baseURL(baseURL)
@@ -33,8 +34,8 @@ class ClaimGatlingTest extends Simulation {
     )
 
     val headers_http_authenticated = Map(
-        "Accept" -> """application/json""",
-        "X-XSRF-TOKEN" -> "${xsrf_token}"
+        "Accept" -> """application/json"""
+        //"X-XSRF-TOKEN" -> "${xsrf_token}"
     )
 
     val keycloakHeaders = Map(
@@ -43,22 +44,17 @@ class ClaimGatlingTest extends Simulation {
     )
 
     val scn = scenario("Test the Claim entity")
-        .exec(http("First unauthenticated request")
-        .get("/api/account")
-        .headers(headers_http)
-        .check(status.is(401))
-        .check(headerRegex("Set-Cookie", "XSRF-TOKEN=(.*);[\\s]").saveAs("xsrf_token"))).exitHereIfFailed
-        .pause(10)
         .exec(http("Authentication")
-        .get("/login")
-        .headers(keycloakHeaders)
-        .check(css("#kc-form-login", "action").saveAs("kc-form-login"))).exitHereIfFailed
-        .pause(10)
+            .get("/login")
+            .headers(keycloakHeaders)
+            .check(css("#kc-form-login", "action").saveAs("kc-form-login"))
+        ).exitHereIfFailed
+        .pause(1,10)
         .exec(http("Authenticate")
         .post("${kc-form-login}")
         .headers(keycloakHeaders)
-        .formParam("username", "admin")
-        .formParam("password", "admin")
+        .formParam("username", "user")
+        .formParam("password", "user")
         .formParam("submit", "Login")
         .check(status.is(200))).exitHereIfFailed
         .pause(1)
@@ -66,7 +62,7 @@ class ClaimGatlingTest extends Simulation {
         .get("/api/account")
         .headers(headers_http_authenticated)
         .check(status.is(200)))
-        .pause(10)
+        .pause(1, 10)
         .repeat(2) {
             exec(http("Get all claims")
             .get("/claims/api/claims")
@@ -76,25 +72,28 @@ class ClaimGatlingTest extends Simulation {
             .exec(http("Create new claim")
             .post("/claims/api/claims")
             .headers(headers_http_authenticated)
-            .body(StringBody("""{"id":null, "identifier":"SAMPLE_TEXT"}""")).asJSON
+            .body(StringBody("""{"id":, "identifier":"SAMPLE_TEXT"}""")).asJSON
             .check(status.is(201))
             .check(headerRegex("Location", "(.*)").saveAs("new_claim_url"))).exitHereIfFailed
-            .pause(10)
+            .pause(1, 10)
             .repeat(5) {
                 exec(http("Get created claim")
                 .get("/claims${new_claim_url}")
                 .headers(headers_http_authenticated))
-                .pause(10)
+                .pause(1, 10)
             }
             .exec(http("Delete created claim")
             .delete("/claims${new_claim_url}")
             .headers(headers_http_authenticated))
-            .pause(10)
+            .pause(1, 10)
         }
 
     val users = scenario("Users").exec(scn)
 
     setUp(
-        users.inject(rampUsers(Integer.getInteger("users", 100)) over (Integer.getInteger("ramp", 1) minutes))
+        users.inject(
+            rampUsers(Integer.getInteger("users", 200)) over (Integer.getInteger("ramp", 200) seconds),
+                constantUsersPerSec(200) during(30 minutes)
+        )
     ).protocols(httpConf)
 }

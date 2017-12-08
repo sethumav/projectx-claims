@@ -19,4 +19,6 @@
         <appender-ref ref="CONSOLE" />
     </root>
 
+    <!--<logger name="io.gatling.http.ahc" level="DEBUG" />-->
+
 </configuration>

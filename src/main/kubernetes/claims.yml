@@ -29,11 +29,18 @@ spec:
             "java",
             "-Dspring.profiles.active=dev",
             "-Djava.security.egd=file:/dev/./urandom",
+            "-Xmx512m",
             "-jar",
             "/app.war",
             "-b",
             "0.0.0.0"
         ]
+        resources:
+          limits:
+            memory: "786Mi"
+          requests:
+            memory: "786Mi"
+            cpu: "100m"
         env:
         - name: KEYCLOAK_EXT_URL
           value: http://keycloak.52.237.23.30.nip.io
