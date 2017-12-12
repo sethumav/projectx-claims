@@ -75,6 +75,8 @@ public class ClaimResource {
     @PutMapping("/claims")
     @Timed
     public ResponseEntity<Claim> updateClaim(@Valid @RequestBody Claim claim) throws URISyntaxException {
+
+        //comment for demo
         log.debug("REST request to update Claim : {}", claim);
         if (claim.getId() == null) {
             return createClaim(claim);
