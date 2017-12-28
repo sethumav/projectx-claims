@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 /**
- * REST controller for managing Claim.
+ * REST controller for managing Claim. testing
  */
 @RestController
 @RequestMapping("/api")
